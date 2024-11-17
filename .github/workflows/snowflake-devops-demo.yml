@@ -1,52 +1,43 @@
-name: snowflake-devops-demo  # The name of the workflow displayed in the GitHub Actions UI.
+name: snowflake-devops-demo
 
-# Controls when the workflow will run.
+# Controls when the action will run. 
 on:
   push:
     branches:
-      - main  # The workflow will trigger when there is a push to the "main" branch.
+      - main
     paths:
-      - 'migrations/**'  # It only triggers if files in the 'migrations' folder are modified.
+      - 'migrations/**'
 
-  # Allows you to manually trigger the workflow from GitHub Actions UI.
+  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
 jobs:
-  deploy-snowflake-changes-job:  # A job to deploy changes to Snowflake.
-    runs-on: ubuntu-latest  # The job runs on an Ubuntu-based virtual machine.
+  deploy-snowflake-changes-job:
+    runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout repository
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout repository
-        uses: actions/checkout@v2  # This action checks out the repository code so it can be accessed in this job.
+        uses: actions/checkout@v2
 
-      # Step 2: Set up Python environment
       - name: Use Python 3.8.x
-        uses: actions/setup-python@v2.2.1  # This action sets up a Python environment in the job.
+        uses: actions/setup-python@v2.2.1
         with:
-          python-version: 3.8.x  # Specifies the Python version to use (3.8.x).
+          python-version: 3.8.x
 
-      # Step 3: Install and run schemachange
       - name: Run schemachange
         env:
-          SF_ACCOUNT: ${{ secrets.SF_ACCOUNT }}  # Snowflake account name from GitHub Secrets.
-          SF_USERNAME: ${{ secrets.SF_USERNAME }}  # Snowflake username from GitHub Secrets.
-          SF_ROLE: ${{ secrets.SF_ROLE }}  # Snowflake role from GitHub Secrets.
-          SF_WAREHOUSE: ${{ secrets.SF_WAREHOUSE }}  # Snowflake warehouse from GitHub Secrets.
-          SF_DATABASE: ${{ secrets.SF_DATABASE }}  # Snowflake database from GitHub Secrets.
-          SNOWFLAKE_PASSWORD: ${{ secrets.SF_PASSWORD }}  # Snowflake password from GitHub Secrets.
+          SF_ACCOUNT: ${{ secrets.SF_ACCOUNT }}
+          SF_USERNAME: ${{ secrets.SF_USERNAME }}
+          SF_ROLE: ${{ secrets.SF_ROLE }}
+          SF_WAREHOUSE: ${{ secrets.SF_WAREHOUSE }}
+          SF_DATABASE: ${{ secrets.SF_DATABASE }}
+          SNOWFLAKE_PASSWORD: ${{ secrets.SF_PASSWORD }}
         run: |
-          echo "GITHUB_WORKSPACE: $GITHUB_WORKSPACE"  # Logs the workspace directory path.
-          python --version  # Verifies the Python version installed in the environment.
+          echo "GITHUB_WORKSPACE: $GITHUB_WORKSPACE"
+          python --version
           echo "Step 1: Installing schemachange"
-          pip install schemachange  # Installs the 'schemachange' package, used for database migration management.
-
+          pip install schemachange
+          
           echo "Step 2: Running schemachange"
-          schemachange -f $GITHUB_WORKSPACE/migrations \  # Runs schemachange on the 'migrations' folder.
-                       -a $SF_ACCOUNT \                  # Specifies the Snowflake account.
-                       -u $SF_USERNAME \                # Specifies the Snowflake username.
-                       -r $SF_ROLE \                    # Specifies the Snowflake role.
-                       -w $SF_WAREHOUSE \               # Specifies the Snowflake warehouse.
-                       -d $SF_DATABASE \                # Specifies the Snowflake database.
-                       -c $SF_DATABASE.SCHEMACHANGE.CHANGE_HISTORY \  # Specifies the table for tracking change history.
-                       --create-change-history-table    # Creates the change history table if it doesn't exist.
+          schemachange -f $GITHUB_WORKSPACE/migrations -a $SF_ACCOUNT -u $SF_USERNAME -r $SF_ROLE -w $SF_WAREHOUSE -d $SF_DATABASE -c $SF_DATABASE.SCHEMACHANGE.CHANGE_HISTORY --create-change-history-table
