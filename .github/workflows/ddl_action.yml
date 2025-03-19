@@ -45,7 +45,7 @@ jobs:
 
     - name: Push changes
       run: |
-        git push origin main
+        git push https://x-access-token:${{ secrets.PAT_TOKEN }}@github.com/${{ github.repository }}.git HEAD:main
 
 ##### BOT WORKING ON THE PUSH CHANGES ###########
 # name: Run Python Script
