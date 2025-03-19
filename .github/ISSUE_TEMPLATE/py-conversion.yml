@@ -1,0 +1,29 @@
+name: Run Python Script
+description: Specify the inputs for running the Python script.
+title: "[Run Python Script] "
+labels: python, automation
+body:
+  - type: input
+    id: dbSfname
+    attributes:
+      label: Database Name
+      description: "Enter the database name."
+      placeholder: "Dbname"
+    validations:
+      required: true
+  - type: input
+    id: schemaSfname
+    attributes:
+      label: Schema Name
+      description: "Enter the schema name."
+      placeholder: "Schemaname"
+    validations:
+      required: true
+  - type: input
+    id: fileLoc
+    attributes:
+      label: Folder Location
+      description: "Enter the folder location of the SQL files."
+      placeholder: "ddl_files"
+    validations:
+      required: true
