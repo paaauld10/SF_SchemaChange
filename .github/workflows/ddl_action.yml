@@ -17,7 +17,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
-        python-version: '3.10'
+        python-version: '3.x'
 
     # Uncomment the following step if you have a requirements.txt file
     # - name: Install dependencies
@@ -44,9 +44,59 @@ jobs:
         git commit -m "Rename and update SQL files"
 
     - name: Push changes
-      uses: ad-m/github-push-action@v0.6.0
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        git push https://x-access-token:${{ secrets.PAT_TOKEN }}@github.com/${{ github.repository }}.git HEAD:main
+
+##### BOT WORKING ON THE PUSH CHANGES ###########
+# name: Run Python Script
+
+# on:
+#   issues:
+#     types: [opened]
+
+# jobs:
+#   run-script:
+#     runs-on: ubuntu-latest
+
+#     steps:
+#     - name: Checkout repository
+#       uses: actions/checkout@v2
+#       with:
+#         persist-credentials: false # This ensures the credentials are not persisted
+
+#     - name: Set up Python
+#       uses: actions/setup-python@v2
+#       with:
+#         python-version: '3.10'
+
+#     # Uncomment the following step if you have a requirements.txt file
+#     # - name: Install dependencies
+#     #   run: |
+#     #     python -m pip install --upgrade pip
+#     #     pip install -r requirements.txt
+
+#     - name: Run Python script
+#       run: |
+#         python .github/workflows/main.py
+#       env:
+#         DB_SFNAME: ${{ github.event.issue.body.dbSfname }}
+#         SCHEMA_SFNAME: ${{ github.event.issue.body.schemaSfname }}
+#         FILE_LOC: ${{ github.event.issue.body.fileLoc }}
+
+#     - name: Configure git
+#       run: |
+#         git config --global user.name 'github-actions[bot]'
+#         git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+
+#     - name: Commit changes
+#       run: |
+#         git add snowflake/conversion
+#         git commit -m "Rename and update SQL files"
+
+#     - name: Push changes
+#       uses: ad-m/github-push-action@v0.6.0
+#       with:
+#         github_token: ${{ secrets.GITHUB_TOKEN }}
 
 
 # ###############################
