@@ -5,7 +5,6 @@ import os
 dbSfname = os.getenv('DB_SFNAME', 'Dbname')
 schemaSfname = os.getenv('SCHEMA_SFNAME', 'Schemaname')
 fileLoc = os.getenv('FILE_LOC', 'ddl_files')
-# folder_path = fr"{fileLoc}"
 folder_path = "snowflake/conversion"
 
 def extract_table_info(ddl):
@@ -21,10 +20,12 @@ def extract_table_info(ddl):
     return None, None, None
 
 def rename_ddl_files(folder_path):
+    print(f"Processing files in folder: {folder_path}")
     # Loop through all .sql files in the folder
     for file_name in os.listdir(folder_path):
         if file_name.endswith(".sql"):
             file_path = os.path.join(folder_path, file_name)
+            print(f"Reading file: {file_path}")
             
             # Read DDL content
             with open(file_path, 'r') as file:
@@ -32,6 +33,7 @@ def rename_ddl_files(folder_path):
 
             # Extract table info
             db_name, schema_name, table_name = extract_table_info(ddl_content)
+            print(f"Extracted info - DB: {db_name}, Schema: {schema_name}, Table: {table_name}")
             
             if table_name:
                 # Generate new file name
@@ -56,6 +58,8 @@ def rename_ddl_files(folder_path):
                     file.write(ddl_content)
 
                 print("Done Replace")
+            else:
+                print(f"No table info found in {file_name}")
 
 if __name__ == "__main__":
     # Example usage

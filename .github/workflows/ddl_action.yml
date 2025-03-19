@@ -29,3 +29,4 @@ jobs:
       env:
         DB_SFNAME: ${{ github.event.issue.body.dbSfname }}
         SCHEMA_SFNAME: ${{ github.event.issue.body.schemaSfname }}
+        FILE_LOC: ${{ github.event.issue.body.fileLoc }}
