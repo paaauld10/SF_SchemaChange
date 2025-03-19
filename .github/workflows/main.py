@@ -5,7 +5,7 @@ import os
 dbSfname = os.getenv('DB_SFNAME', 'Dbname')
 schemaSfname = os.getenv('SCHEMA_SFNAME', 'Schemaname')
 fileLoc = os.getenv('FILE_LOC', 'ddl_files')
-folder_path = 'snowflake/conversion'
+folder_path = 'SF_SchemaChange/snowflake/conversion'
 
 def extract_table_info(ddl):
     # Regex to handle 'CREATE OR REPLACE TABLE' and 'CREATE TABLE'
