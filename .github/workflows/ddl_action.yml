@@ -25,7 +25,7 @@ jobs:
 
     - name: Run Python script
       run: |
-        python main.py
+        python .github/workflows/main.py
       env:
         DB_SFNAME: ${{ github.event.issue.body.dbSfname }}
         SCHEMA_SFNAME: ${{ github.event.issue.body.schemaSfname }}
