@@ -14,16 +14,14 @@ jobs:
       with:
         persist-credentials: false # This ensures the credentials are not persisted
 
-    - name: Checkout feature branch
-      run: |
-        git fetch origin
-        git checkout ${{ github.event.issue.body.featureBranch }}
-        git branch
-
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
         python-version: '3.10'
+
+    - name: Checkout feature branch
+      run: |
+        git checkout ${{ github.event.issue.body.featureBranch }}
 
     # Uncomment the following step if you have a requirements.txt file
     # - name: Install dependencies
@@ -39,10 +37,6 @@ jobs:
         SCHEMA_SFNAME: ${{ github.event.issue.body.schemaSfname }}
         FILE_LOC: ${{ github.event.issue.body.fileLoc }}
 
-    - name: List files before commit
-      run: |
-        ls -l snowflake/conversion
-
     - name: Configure git
       run: |
         git config --global user.name 'github-actions[bot]'
@@ -51,15 +45,8 @@ jobs:
     - name: Commit changes
       run: |
         git add snowflake/conversion
-        git status
-        git commit -m "Rename and update SQL files" || echo "No changes to commit"
+        git commit -m "Rename and update SQL files"
 
-    # - name: Push changes
-    #   run: |
-    #     git push https://x-access-token:${{ secrets.PAT_TOKEN }}@github.com/${{ github.repository }}.git HEAD:main
     - name: Push changes
       run: |
         git push https://x-access-token:${{ secrets.PAT_TOKEN }}@github.com/${{ github.repository }}.git ${{ github.event.issue.body.featureBranch }}
-    # - name: Push changes
-    #   run: |
-    #     git push https://x-access-token:${{ secrets.PAT_TOKEN }}@github.com/${{ github.repository }}.git HEAD:${{ github.event.issue.body.featureBranch }}
