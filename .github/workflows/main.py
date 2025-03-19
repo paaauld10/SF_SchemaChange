@@ -44,6 +44,7 @@ def rename_ddl_files(folder_path):
                 os.rename(file_path, new_file_path)
                 print(f"Renamed: {file_name} ➜ {new_file_name}")
 
+                # Change the Syntax into CREATE OR ALTER TABLE
                 tbl_patterns = [
                     r'CREATE\s+(?:OR\s+REPLACE\s+)?TABLE',
                     r'CREATE\s+TABLE',
