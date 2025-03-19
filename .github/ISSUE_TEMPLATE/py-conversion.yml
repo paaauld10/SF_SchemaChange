@@ -19,11 +19,3 @@ body:
       placeholder: "Schemaname"
     validations:
       required: true
-  - type: input
-    id: fileLoc
-    attributes:
-      label: Folder Location
-      description: "Enter the folder location of the SQL files."
-      placeholder: "ddl_files"
-    validations:
-      required: true

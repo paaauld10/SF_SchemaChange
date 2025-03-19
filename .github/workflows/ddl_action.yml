@@ -14,10 +14,6 @@ on:
         description: 'Enter Schema'
         required: true
         default: 'Schemaname'
-      fileLoc:
-        description: 'Enter folder Locations'
-        required: true
-        default: 'ddl_files'
 
 jobs:
   run-script:
@@ -43,4 +39,3 @@ jobs:
       env:
         DB_SFNAME: ${{ github.event.inputs.dbSfname }}
         SCHEMA_SFNAME: ${{ github.event.inputs.schemaSfname }}
-        FILE_LOC: ${{ github.event.inputs.fileLoc }}
