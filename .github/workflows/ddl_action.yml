@@ -17,7 +17,7 @@ jobs:
     - name: Checkout feature branch
       run: |
         git fetch origin
-        git checkout -b ${{ github.event.issue.body.featureBranch }} origin/${{ github.event.issue.body.featureBranch }}
+        git checkout ${{ github.event.issue.body.featureBranch }}
 
     - name: Set up Python
       uses: actions/setup-python@v2
@@ -51,8 +51,7 @@ jobs:
       run: |
         git add snowflake/conversion
         git status
-        git commit -m "Rename and update SQL files" || echo "No changes to commit"
-        
+        git commit -m "Rename and update SQL files" || echo "No changes to commi
     # - name: Push changes
     #   run: |
     #     git push https://x-access-token:${{ secrets.PAT_TOKEN }}@github.com/${{ github.repository }}.git HEAD:main
