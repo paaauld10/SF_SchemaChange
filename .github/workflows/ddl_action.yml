@@ -14,10 +14,15 @@ jobs:
       with:
         persist-credentials: false # This ensures the credentials are not persisted
 
+    # - name: Checkout feature branch
+    #   run: |
+    #     git fetch origin
+    #     git checkout ${{ github.event.issue.body.featureBranch }}
+    #     git branch
     - name: Checkout feature branch
       run: |
         git fetch origin
-        git checkout ${{ github.event.issue.body.featureBranch }}
+        git checkout -b ${{ github.event.issue.body.featureBranch }} origin/${{ github.event.issue.body.featureBranch }}
         git branch
 
     - name: Set up Python
