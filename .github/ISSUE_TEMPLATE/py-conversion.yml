@@ -19,3 +19,11 @@ body:
       placeholder: "Schemaname"
     validations:
       required: true
+  - type: input
+    id: featureBranch
+    attributes:
+      label: Feature Branch
+      description: "Enter the name of the feature branch."
+      placeholder: "feature-branch-name"
+    validations:
+      required: true
