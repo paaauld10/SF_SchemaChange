@@ -1,10 +1,10 @@
 ##################
 name: Run Python Script
 
-# on:
-#   issues:
-#     types: [opened]
-on: [push]
+on:
+  issues:
+    types: [opened]
+# on: [push]
 
 jobs:
   run-script:
@@ -13,18 +13,9 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
-
-    - name: Extract feature branch from issue body
-      id: extract_branch
-      run: |
-        BRANCH_NAME=$(echo "${{ github.event.issue.body }}" | awk '/^### Feature Branch/ {getline; getline; print}')
-        echo "Extracted Branch: $BRANCH_NAME"
-        echo "feature_branch=$BRANCH_NAME" >> $GITHUB_ENV
-
-    - name: Checkout feature branch
-      uses: actions/checkout@v4
       with:
-        ref: ${{ env.feature_branch }}
+        # persist-credentials: false # This ensures the credentials are not persisted
+        ref: stage
 
     # - name: Print featurebranch
     #   run: |
@@ -77,4 +68,4 @@ jobs:
 
     - name: Push changes
       run: |
-        git push https://x-access-token:${{ secrets.PAT_TOKEN }}@github.com/${{ github.repository }}.git ${{ github.event.issue.body.featureBranch }}
+        git push https://x-access-token:${{ secrets.PAT_TOKEN }}@github.com/${{ github.repository }}.git stage
