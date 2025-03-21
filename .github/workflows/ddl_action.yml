@@ -12,7 +12,7 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
       with:
-        persist-credentials: false # This ensures the credentials are not persisted
+        # persist-credentials: false # This ensures the credentials are not persisted
         ref: ${{ github.event.issue.body.featureBranch }}
 
     - name: Print featurebranch
