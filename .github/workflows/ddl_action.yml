@@ -14,8 +14,7 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
       with:
-        # persist-credentials: false # This ensures the credentials are not persisted
-        persist-credentials: true
+        persist-credentials: false # This ensures the credentials are not persisted
         ref: stage
 
     # - name: Print featurebranch
