@@ -18,17 +18,17 @@ jobs:
         echo "Extracting inputs from issue body..."
         
         # Extract feature branch
-        FEATURE_BRANCH=$(echo "${{ github.event.issue.body }}" | grep -oP '(?<=Feature Branch: ).*')
+        FEATURE_BRANCH=$(echo "${{ github.event.issue.body }}" | awk -F '\n' '/### Feature Branch/ {getline; print $1}')
         echo "Feature Branch: $FEATURE_BRANCH"
         echo "feature_branch=$FEATURE_BRANCH" >> $GITHUB_ENV
         
         # Extract Database Name
-        DB_SFNAME=$(echo "${{ github.event.issue.body }}" | grep -oP '(?<=Database Name: ).*')
+        DB_SFNAME=$(echo "${{ github.event.issue.body }}" | awk -F '\n' '/### Database Name/ {getline; print $1}')
         echo "Database Name: $DB_SFNAME"
         echo "db_sfname=$DB_SFNAME" >> $GITHUB_ENV
         
         # Extract Schema Name
-        SCHEMA_SFNAME=$(echo "${{ github.event.issue.body }}" | grep -oP '(?<=Schema Name: ).*')
+        SCHEMA_SFNAME=$(echo "${{ github.event.issue.body }}" | awk -F '\n' '/### Schema Name/ {getline; print $1}')
         echo "Schema Name: $SCHEMA_SFNAME"
         echo "schema_sfname=$SCHEMA_SFNAME" >> $GITHUB_ENV
 
