@@ -9,19 +9,23 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-      with:
-        persist-credentials: false # This ensures the credentials are not persisted
+    # - name: Checkout repository
+    #   uses: actions/checkout@v4
+    #   with:
+    #     persist-credentials: false # This ensures the credentials are not persisted
+
+    - name: Checkout feature branch
+      run: |
+        git checkout ${{ github.event.issue.body.featureBranch }}
 
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
         python-version: '3.10'
 
-    - name: Checkout feature branch
-      run: |
-        git checkout ${{ github.event.issue.body.featureBranch }}
+    # - name: Checkout feature branch
+    #   run: |
+    #     git checkout ${{ github.event.issue.body.featureBranch }}
 
     # Uncomment the following step if you have a requirements.txt file
     # - name: Install dependencies
