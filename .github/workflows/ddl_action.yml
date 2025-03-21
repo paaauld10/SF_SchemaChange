@@ -17,18 +17,20 @@ jobs:
       run: |
         echo "Extracting inputs from issue body..."
 
+        ISSUE_BODY="${{ github.event.issue.body }}"
+
         # Extract Feature Branch
-        FEATURE_BRANCH=$(echo "${{ github.event.issue.body }}" | sed -n '/### Feature Branch/{n;p;}' | tr -d '\r')
+        FEATURE_BRANCH=$(echo "$ISSUE_BODY" | awk '/### Feature Branch/{getline; print}')
         echo "Extracted Feature Branch: $FEATURE_BRANCH"
         echo "feature_branch=$FEATURE_BRANCH" >> $GITHUB_ENV
 
         # Extract Database Name
-        DB_SFNAME=$(echo "${{ github.event.issue.body }}" | sed -n '/### Database Name/{n;p;}' | tr -d '\r')
+        DB_SFNAME=$(echo "$ISSUE_BODY" | awk '/### Database Name/{getline; print}')
         echo "Extracted Database Name: $DB_SFNAME"
         echo "db_sfname=$DB_SFNAME" >> $GITHUB_ENV
 
         # Extract Schema Name
-        SCHEMA_SFNAME=$(echo "${{ github.event.issue.body }}" | sed -n '/### Schema Name/{n;p;}' | tr -d '\r')
+        SCHEMA_SFNAME=$(echo "$ISSUE_BODY" | awk '/### Schema Name/{getline; print}')
         echo "Extracted Schema Name: $SCHEMA_SFNAME"
         echo "schema_sfname=$SCHEMA_SFNAME" >> $GITHUB_ENV
 
@@ -50,7 +52,7 @@ jobs:
 
     - name: Print Current Branch
       run: |
-        echo "Current branch: $(git branch --show-current)"
+        echo "✅ Successfully checked out branch: $(git branch --show-current)"
 
     - name: Set up Python
       uses: actions/setup-python@v4
@@ -59,16 +61,16 @@ jobs:
 
     - name: Install Dependencies
       run: |
-        python -m pip install --upgrade pip
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        pip install --upgrade pip
+        pip install -r requirements.txt || echo "⚠️ No requirements.txt found, skipping installation."
 
-    - name: Run Python Script
+    - name: Run Python script
       run: |
         python .github/workflows/main.py
       env:
         DB_SFNAME: ${{ env.db_sfname }}
         SCHEMA_SFNAME: ${{ env.schema_sfname }}
-        FILE_LOC: ${{ github.event.issue.body.fileLoc }}
+        FILE_LOC: ${{ env.file_loc }}
 
     - name: Configure Git
       run: |
@@ -78,8 +80,8 @@ jobs:
     - name: Commit Changes
       run: |
         git add snowflake/conversion
-        git commit -m "Rename and update SQL files" || echo "No changes to commit"
+        git commit -m "Rename and update SQL files"
 
     - name: Push Changes
       run: |
-        git push https://x-access-token:${{ secrets.PAT_TOKEN }}@github.com/${{ github.repository }}.git ${{ env.feature_branch }} || echo "No changes to push"
+        git push https://x-access-token:${{ secrets.PAT_TOKEN }}@github.com/${{ github.repository }}.git ${{ env.feature_branch }}
