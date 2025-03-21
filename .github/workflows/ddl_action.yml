@@ -9,43 +9,60 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Debug Issue Body
-        run: |
-          echo "Issue Body: ${{ github.event.issue.body }}"
+    - name: Checkout repository
+      uses: actions/checkout@v4
 
-      - name: Extract Feature Branch Name
-        id: extract_branch
-        run: |
-          FEATURE_BRANCH=$(echo '${{ github.event.issue.body }}' | grep -oP '(?<=Feature Branch: ).*' | tr -d '\r')
-          echo "Extracted branch: $FEATURE_BRANCH"
-          echo "FEATURE_BRANCH=$FEATURE_BRANCH" >> $GITHUB_ENV
+    - name: Extract Inputs from Issue Body
+      id: extract_inputs
+      run: |
+        echo "Extracting inputs from issue body..."
+        
+        # Extract feature branch
+        FEATURE_BRANCH=$(echo "${{ github.event.issue.body }}" | grep -oP '(?<=Feature Branch: ).*')
+        echo "Feature Branch: $FEATURE_BRANCH"
+        echo "feature_branch=$FEATURE_BRANCH" >> $GITHUB_ENV
+        
+        # Extract Database Name
+        DB_SFNAME=$(echo "${{ github.event.issue.body }}" | grep -oP '(?<=Database Name: ).*')
+        echo "Database Name: $DB_SFNAME"
+        echo "db_sfname=$DB_SFNAME" >> $GITHUB_ENV
+        
+        # Extract Schema Name
+        SCHEMA_SFNAME=$(echo "${{ github.event.issue.body }}" | grep -oP '(?<=Schema Name: ).*')
+        echo "Schema Name: $SCHEMA_SFNAME"
+        echo "schema_sfname=$SCHEMA_SFNAME" >> $GITHUB_ENV
 
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ env.FEATURE_BRANCH }}
+    - name: Checkout Feature Branch
+      run: |
+        git fetch origin ${{ env.feature_branch }}
+        git checkout ${{ env.feature_branch }}
 
-      - name: Print current branch
-        run: |
-          echo "Current branch: $(git branch --show-current)"
+    - name: Print current branch
+      run: |
+        echo "Current branch: $(git branch --show-current)"
 
-      - name: Run Python script
-        run: |
-          python .github/workflows/main.py
-        env:
-          DB_SFNAME: ${{ github.event.issue.body.dbSfname }}
-          SCHEMA_SFNAME: ${{ github.event.issue.body.schemaSfname }}
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
 
-      - name: Configure Git
-        run: |
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+    - name: Run Python script
+      run: |
+        python .github/workflows/main.py
+      env:
+        DB_SFNAME: ${{ env.db_sfname }}
+        SCHEMA_SFNAME: ${{ env.schema_sfname }}
 
-      - name: Commit changes
-        run: |
-          git add snowflake/conversion
-          git commit -m "Rename and update SQL files"
+    - name: Configure git
+      run: |
+        git config --global user.name 'github-actions[bot]'
+        git config --global user.email 'github-actions[bot]@users.noreply.github.com'
 
-      - name: Push changes
-        run: |
-          git push https://x-access-token:${{ secrets.PAT_TOKEN }}@github.com/${{ github.repository }}.git ${{ env.FEATURE_BRANCH }}
+    - name: Commit changes
+      run: |
+        git add snowflake/conversion
+        git commit -m "Rename and update SQL files" || echo "No changes to commit"
+
+    - name: Push changes
+      run: |
+        git push https://x-access-token:${{ secrets.PAT_TOKEN }}@github.com/${{ github.repository }}.git ${{ env.feature_branch }}
