@@ -34,6 +34,22 @@ def rename_ddl_files(folder_path):
             # Extract table info
             db_name, schema_name, table_name = extract_table_info(ddl_content)
             print(f"Extracted info - DB: {db_name}, Schema: {schema_name}, Table: {table_name}")
+
+            # Change the Syntax into CREATE OR ALTER TABLE
+            tbl_patterns = [
+                r'CREATE\s+(?:OR\s+REPLACE\s+)?TABLE',
+                r'CREATE\s+TABLE',
+                r'CREATE\s+TABLE\s+IF\s+NOT\s+EXIST',
+            ]
+
+            for pattern in tbl_patterns:
+                ddl_content = re.sub(pattern, 'CREATE OR ALTER TABLE', ddl_content, flags=re.IGNORECASE)
+
+            # Write the modified content back to the file
+            with open(new_file_path, 'w') as file:
+                file.write(ddl_content)
+
+            print("Done Replace")
             
             if table_name:
                 # Generate new file name
@@ -44,21 +60,21 @@ def rename_ddl_files(folder_path):
                 os.rename(file_path, new_file_path)
                 print(f"Renamed: {file_name} ➜ {new_file_name}")
 
-                # Change the Syntax into CREATE OR ALTER TABLE
-                tbl_patterns = [
-                    r'CREATE\s+(?:OR\s+REPLACE\s+)?TABLE',
-                    r'CREATE\s+TABLE',
-                    r'CREATE\s+TABLE\s+IF\s+NOT\s+EXIST',
-                ]
+                # # Change the Syntax into CREATE OR ALTER TABLE
+                # tbl_patterns = [
+                #     r'CREATE\s+(?:OR\s+REPLACE\s+)?TABLE',
+                #     r'CREATE\s+TABLE',
+                #     r'CREATE\s+TABLE\s+IF\s+NOT\s+EXIST',
+                # ]
 
-                for pattern in tbl_patterns:
-                    ddl_content = re.sub(pattern, 'CREATE OR ALTER TABLE', ddl_content, flags=re.IGNORECASE)
+                # for pattern in tbl_patterns:
+                #     ddl_content = re.sub(pattern, 'CREATE OR ALTER TABLE', ddl_content, flags=re.IGNORECASE)
 
-                # Write the modified content back to the file
-                with open(new_file_path, 'w') as file:
-                    file.write(ddl_content)
+                # # Write the modified content back to the file
+                # with open(new_file_path, 'w') as file:
+                #     file.write(ddl_content)
 
-                print("Done Replace")
+                # print("Done Replace")
             else:
                 print(f"No table info found in {file_name}")
 
