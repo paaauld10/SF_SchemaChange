@@ -12,49 +12,74 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Debug Issue Body
-      run: |
-        echo "==== Issue Body Start ===="
-        echo "${{ github.event.issue.body }}"
-        echo "==== Issue Body End ===="
-
     - name: Extract Inputs from Issue Body
       id: extract_inputs
       run: |
         echo "Extracting inputs from issue body..."
-        
-        # Extract feature branch
-        FEATURE_BRANCH=$(echo "${{ github.event.issue.body }}" | awk -F '\n' '/### Feature Branch/{getline; print $1}')
+
+        # Extract Feature Branch
+        FEATURE_BRANCH=$(echo "${{ github.event.issue.body }}" | sed -n '/### Feature Branch/{n;p;}' | tr -d '\r')
         echo "Extracted Feature Branch: $FEATURE_BRANCH"
         echo "feature_branch=$FEATURE_BRANCH" >> $GITHUB_ENV
-        
+
         # Extract Database Name
-        DB_SFNAME=$(echo "${{ github.event.issue.body }}" | awk -F '\n' '/### Database Name/{getline; print $1}')
+        DB_SFNAME=$(echo "${{ github.event.issue.body }}" | sed -n '/### Database Name/{n;p;}' | tr -d '\r')
         echo "Extracted Database Name: $DB_SFNAME"
         echo "db_sfname=$DB_SFNAME" >> $GITHUB_ENV
-        
+
         # Extract Schema Name
-        SCHEMA_SFNAME=$(echo "${{ github.event.issue.body }}" | awk -F '\n' '/### Schema Name/{getline; print $1}')
+        SCHEMA_SFNAME=$(echo "${{ github.event.issue.body }}" | sed -n '/### Schema Name/{n;p;}' | tr -d '\r')
         echo "Extracted Schema Name: $SCHEMA_SFNAME"
         echo "schema_sfname=$SCHEMA_SFNAME" >> $GITHUB_ENV
 
-    - name: Check Extracted Variables
+    - name: Debug Extracted Variables
       run: |
         echo "Feature Branch: ${{ env.feature_branch }}"
         echo "Database Name: ${{ env.db_sfname }}"
         echo "Schema Name: ${{ env.schema_sfname }}"
 
-    - name: Checkout Feature Branch
-      run: |
         if [ -z "${{ env.feature_branch }}" ]; then
-          echo "Error: Feature branch is empty!"
+          echo "❌ Error: Feature branch is empty!"
           exit 1
         fi
 
-        echo "Checking out branch: ${{ env.feature_branch }}"
-        git fetch origin ${{ env.feature_branch }}
-        git checkout ${{ env.feature_branch }}
+    - name: Checkout Feature Branch
+      run: |
+        git fetch origin
+        git checkout ${{ env.feature_branch }} || (echo "❌ Error: Branch does not exist!" && exit 1)
 
     - name: Print Current Branch
       run: |
         echo "Current branch: $(git branch --show-current)"
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+    - name: Run Python Script
+      run: |
+        python .github/workflows/main.py
+      env:
+        DB_SFNAME: ${{ env.db_sfname }}
+        SCHEMA_SFNAME: ${{ env.schema_sfname }}
+        FILE_LOC: ${{ github.event.issue.body.fileLoc }}
+
+    - name: Configure Git
+      run: |
+        git config --global user.name 'github-actions[bot]'
+        git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+
+    - name: Commit Changes
+      run: |
+        git add snowflake/conversion
+        git commit -m "Rename and update SQL files" || echo "No changes to commit"
+
+    - name: Push Changes
+      run: |
+        git push https://x-access-token:${{ secrets.PAT_TOKEN }}@github.com/${{ github.repository }}.git ${{ env.feature_branch }} || echo "No changes to push"
