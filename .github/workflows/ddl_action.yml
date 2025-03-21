@@ -1,9 +1,10 @@
 ##################
 name: Run Python Script
 
-on:
-  issues:
-    types: [opened]
+# on:
+#   issues:
+#     types: [opened]
+on: [push]
 
 jobs:
   run-script:
@@ -16,7 +17,7 @@ jobs:
     - name: Extract feature branch from issue body
       id: extract_branch
       run: |
-        BRANCH_NAME=$(echo "${{ github.event.issue.body }}" | grep -oP '(?<=Feature Branch\n\n).*')
+        BRANCH_NAME=$(echo "${{ github.event.issue.body }}" | awk '/^### Feature Branch/ {getline; getline; print}')
         echo "Extracted Branch: $BRANCH_NAME"
         echo "feature_branch=$BRANCH_NAME" >> $GITHUB_ENV
 
