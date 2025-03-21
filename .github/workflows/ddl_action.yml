@@ -9,10 +9,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    # - name: Checkout repository
-    #   uses: actions/checkout@v4
-    #   with:
-    #     persist-credentials: false # This ensures the credentials are not persisted
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        persist-credentials: false # This ensures the credentials are not persisted
 
     - name: Checkout feature branch
       run: |
