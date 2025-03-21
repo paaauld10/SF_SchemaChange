@@ -14,19 +14,19 @@ jobs:
       uses: actions/checkout@v4
       with:
         # persist-credentials: false # This ensures the credentials are not persisted
-        ref: ${{ github.event.issue.body.featureBranch }}   
+        ref: v2  
 
     # - name: Print featurebranch
     #   run: |
     #     echo "Current branch: ${{ github.event.issue.body.featureBranch }}"
 
-    - name: Print featurebranch
-      run: |
-        git checkout ${{ github.event.issue.body.featureBranch }} || echo "Failed to checkout branch"
+    # - name: Print featurebranch
+    #   run: |
+    #     git checkout ${{ github.event.issue.body.featureBranch }} || echo "Failed to checkout branch"
 
-    - name: Checkout feature branch
-      run: |
-        git checkout ${{ github.event.issue.body.featureBranch }}
+    # - name: Checkout feature branch
+    #   run: |
+    #     git checkout ${{ github.event.issue.body.featureBranch }}
 
     - name: Print current branch
       run: |
