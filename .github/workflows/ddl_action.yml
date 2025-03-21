@@ -14,7 +14,7 @@ jobs:
       uses: actions/checkout@v4
       with:
         # persist-credentials: false # This ensures the credentials are not persisted
-        ref: v2  
+        ref: ${{ github.event.issue.body.featureBranch }}
 
     # - name: Print featurebranch
     #   run: |
@@ -67,4 +67,4 @@ jobs:
 
     - name: Push changes
       run: |
-        git push https://x-access-token:${{ secrets.PAT_TOKEN }}@github.com/${{ github.repository }}.git HEAD:${{ github.event.issue.body.featureBranch }}
+        git push https://x-access-token:${{ secrets.PAT_TOKEN }}@github.com/${{ github.repository }}.git ${{ github.event.issue.body.featureBranch }}
