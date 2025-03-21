@@ -15,6 +15,7 @@ jobs:
       uses: actions/checkout@v4
       with:
         # persist-credentials: false # This ensures the credentials are not persisted
+        persist-credentials: true
         ref: stage
 
     # - name: Print featurebranch
