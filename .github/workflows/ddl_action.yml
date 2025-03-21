@@ -14,6 +14,10 @@ jobs:
       with:
         persist-credentials: false # This ensures the credentials are not persisted
 
+    - name: Print featurebranch
+      run: |
+        echo "Current branch: ${{ github.event.issue.body.featureBranch }}
+
     - name: Checkout feature branch
       run: |
         git checkout ${{ github.event.issue.body.featureBranch }}
