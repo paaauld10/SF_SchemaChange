@@ -18,6 +18,10 @@ jobs:
       run: |
         git checkout ${{ github.event.issue.body.featureBranch }}
 
+    - name: Print current branch
+      run: |
+        echo "Current branch: $(git branch --show-current)"
+
     # - name: Set up Python
     #   uses: actions/setup-python@v2
     #   with:
