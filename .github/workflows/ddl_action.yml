@@ -20,7 +20,7 @@ jobs:
 
     - name: Checkout feature branch
       run: |
-        git checkout ${{ github.event.issue.body.featureBranch }}"
+        git checkout ${{ github.event.issue.body.featureBranch }}
 
     - name: Print current branch
       run: |
