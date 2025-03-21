@@ -12,57 +12,49 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
+    - name: Debug Issue Body
+      run: |
+        echo "==== Issue Body Start ===="
+        echo "${{ github.event.issue.body }}"
+        echo "==== Issue Body End ===="
+
     - name: Extract Inputs from Issue Body
       id: extract_inputs
       run: |
         echo "Extracting inputs from issue body..."
         
         # Extract feature branch
-        FEATURE_BRANCH=$(echo "${{ github.event.issue.body }}" | awk -F '\n' '/### Feature Branch/ {getline; print $1}')
-        echo "Feature Branch: $FEATURE_BRANCH"
+        FEATURE_BRANCH=$(echo "${{ github.event.issue.body }}" | awk -F '\n' '/### Feature Branch/{getline; print $1}')
+        echo "Extracted Feature Branch: $FEATURE_BRANCH"
         echo "feature_branch=$FEATURE_BRANCH" >> $GITHUB_ENV
         
         # Extract Database Name
-        DB_SFNAME=$(echo "${{ github.event.issue.body }}" | awk -F '\n' '/### Database Name/ {getline; print $1}')
-        echo "Database Name: $DB_SFNAME"
+        DB_SFNAME=$(echo "${{ github.event.issue.body }}" | awk -F '\n' '/### Database Name/{getline; print $1}')
+        echo "Extracted Database Name: $DB_SFNAME"
         echo "db_sfname=$DB_SFNAME" >> $GITHUB_ENV
         
         # Extract Schema Name
-        SCHEMA_SFNAME=$(echo "${{ github.event.issue.body }}" | awk -F '\n' '/### Schema Name/ {getline; print $1}')
-        echo "Schema Name: $SCHEMA_SFNAME"
+        SCHEMA_SFNAME=$(echo "${{ github.event.issue.body }}" | awk -F '\n' '/### Schema Name/{getline; print $1}')
+        echo "Extracted Schema Name: $SCHEMA_SFNAME"
         echo "schema_sfname=$SCHEMA_SFNAME" >> $GITHUB_ENV
+
+    - name: Check Extracted Variables
+      run: |
+        echo "Feature Branch: ${{ env.feature_branch }}"
+        echo "Database Name: ${{ env.db_sfname }}"
+        echo "Schema Name: ${{ env.schema_sfname }}"
 
     - name: Checkout Feature Branch
       run: |
+        if [ -z "${{ env.feature_branch }}" ]; then
+          echo "Error: Feature branch is empty!"
+          exit 1
+        fi
+
+        echo "Checking out branch: ${{ env.feature_branch }}"
         git fetch origin ${{ env.feature_branch }}
         git checkout ${{ env.feature_branch }}
 
-    - name: Print current branch
+    - name: Print Current Branch
       run: |
         echo "Current branch: $(git branch --show-current)"
-
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.10'
-
-    - name: Run Python script
-      run: |
-        python .github/workflows/main.py
-      env:
-        DB_SFNAME: ${{ env.db_sfname }}
-        SCHEMA_SFNAME: ${{ env.schema_sfname }}
-
-    - name: Configure git
-      run: |
-        git config --global user.name 'github-actions[bot]'
-        git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-
-    - name: Commit changes
-      run: |
-        git add snowflake/conversion
-        git commit -m "Rename and update SQL files" || echo "No changes to commit"
-
-    - name: Push changes
-      run: |
-        git push https://x-access-token:${{ secrets.PAT_TOKEN }}@github.com/${{ github.repository }}.git ${{ env.feature_branch }}
